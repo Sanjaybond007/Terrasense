@@ -1,0 +1,54 @@
+!pip install gdown
+import json
+import numpy as np
+from PIL import Image
+import gradio as gr
+import tensorflow as tf
+
+# Download class_indices.json from Google Drive
+!gdown '1TrTk037xV8j3eL9iGX7xcREFHTojuUFM' 
+
+# Load class indices 
+class_indices = json.load(open('class_indices.json'))
+
+# Download the pre-trained model from Google Drive
+!gdown '1E-2p_N3H5noSKd3OkFh513Rj0eo3a8HH'
+
+# Load the pre-trained model 
+model = tf.keras.models.load_model('plant_disease_prediction_model.h5')
+
+# Sample mapping of diseases to medicines
+medicine_mapping = {
+    "Apple Black Rot": "Captan or Chorus (Cyprodinil)",  # Recommended fungicides
+    "Potato Early Blight": "Azoxystrobin or Chlorothalonil",  # Recommended fungicides
+    # Add more mappings as needed
+}
+
+# Function to load and preprocess the image
+def load_and_preprocess_image(image):
+    img = image.resize((224, 224))  # Resize to model's expected input
+    img_array = np.array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = img_array.astype('float32') / 255.0
+    return img_array
+
+# Function to predict the class of an image
+def predict_image_class(image):
+    preprocessed_img = load_and_preprocess_image(image)
+    predictions = model.predict(preprocessed_img)
+    predicted_class_index = np.argmax(predictions, axis=1)[0]
+    predicted_class_name = class_indices[str(predicted_class_index)]
+    
+    # Get the corresponding medicine
+    required_medicine = medicine_mapping.get(predicted_class_name, "Captan or Chorus (Cyprodinil)")
+    
+    return predicted_class_name, required_medicine
+
+# Gradio interface
+def classify(image):
+    predicted_class_name, required_medicine = predict_image_class(image)
+    return f"Prediction: {predicted_class_name}, Required Medicine: {required_medicine}"
+
+# Create Gradio app
+interface = gr.Interface(fn=classify, inputs=gr.Image(type="pil"), outputs="text", title="Plant Disease Classifier")
+interface.launch()
