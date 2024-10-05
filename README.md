@@ -1,14 +1,13 @@
+## Project Pitch
+# TerraSense
+Know Your Soil, Grow Your Future
+
+Team ID:  A0007
+
 #info
 This repository was developed by a dedicated team for the Intel KPR Hackathon 2024.
 The team aimed to create an innovative solution that empowers farmers with real-time insights into soil health and crop management. 
 By leveraging advanced technologies such as AI and IoT, they aspire to enhance agricultural practices and promote sustainable farming.
-
-
-
-## Project Pitch
-# TerraSense
- Know Your Soil, Grow Your Future   
- Team ID:  A0007
 
 ---
 
